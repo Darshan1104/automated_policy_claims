@@ -20,12 +20,28 @@ with st.sidebar:
     api_key_input = st.text_input(
         "Enter your Groq API key",
         type="password",
-        #value=os.environ.get("GROQ_API_KEY", ""),
+        value=os.environ.get("GROQ_API_KEY", ""),
         help="Get a free key at https://console.groq.com/keys. "
              "Kept only in this session, not saved anywhere."
     )
     if api_key_input:
         os.environ["GROQ_API_KEY"] = api_key_input
+
+    st.divider()
+    st.subheader("📚 Knowledge Base")
+    try:
+        from retriever import get_collection_status
+        ready, count = get_collection_status()
+        if ready:
+            st.success(f"{count} policy chunks loaded")
+        else:
+            st.info(
+                "No policy documents loaded yet -- they'll be "
+                "ingested automatically from data/policies/ on your "
+                "first claim."
+            )
+    except Exception:
+        st.info("Knowledge base status unavailable yet.")
 
 st.title("🏥 Insurance Claims Adjudication Agent")
 
