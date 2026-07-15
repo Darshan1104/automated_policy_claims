@@ -23,7 +23,10 @@ embeddings = HuggingFaceEmbeddings(
     model_name="BAAI/bge-small-en-v1.5"
 )
 
-qdrant_client = QdrantClient(path="vectordb")
+qdrant_client = QdrantClient(
+    url=os.environ["QDRANT_URL"],
+    api_key=os.environ["QDRANT_API_KEY"],
+)
 
 if qdrant_client is not None:
     print("Qdrant client initialized successfully (local mode).")
