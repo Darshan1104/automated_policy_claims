@@ -1,0 +1,15 @@
+CLAIM ADJUDICATION RULES
+
+A claim can be approved only if:
+
+1. The loss is covered.
+2. The claimant has an active policy.
+3. Required endorsements are present.
+4. Fraud indicators are absent.
+
+A claim must be escalated to a human adjuster if:
+
+- Multiple conflicting policy clauses exist.
+- Retrieved context is insufficient.
+- Confidence is low.
+- State regulations are required.

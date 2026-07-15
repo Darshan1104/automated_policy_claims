@@ -1,0 +1,20 @@
+# Virtual Environment
+venv/
+.venv/
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# Environment Variables (API Keys)
+.env
+
+# Generated Vector Database (Do NOT commit this)
+data/vectordb/
+vectordb/
+.chroma/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
