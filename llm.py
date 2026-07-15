@@ -23,10 +23,17 @@ embeddings = HuggingFaceEmbeddings(
     model_name="BAAI/bge-small-en-v1.5"
 )
 
-qdrant_client = QdrantClient(
-    url="https://59552c81-d1a3-46d7-ace6-03db960e6505.eu-west-1-0.aws.cloud.qdrant.io"
-    api_key=os.environ["QDRANT_API_KEY"],
-)
+api_key = os.getenv("QDRANT_API_KEY")
+
+if not api_key:
+    # Option 1: Handle it gracefully (e.g., skip init or log warning)
+    print("Warning: QDRANT_API_KEY not found. Qdrant client will not be initialized.")
+    qdrant_client = None
+else:
+    qdrant_client = QdrantClient(
+        url="https://59552c81-d1a3-46d7-ace6-03db960e6505.eu-west-1-0.aws.cloud.qdrant.io",
+        api_key=api_key,
+    )
 
 if qdrant_client is not None:
     print("Qdrant client initialized successfully (local mode).")
