@@ -24,7 +24,7 @@ embeddings = HuggingFaceEmbeddings(
 )
 
 qdrant_client = QdrantClient(
-    url=os.environ["QDRANT_URL"],
+    url=https://59552c81-d1a3-46d7-ace6-03db960e6505.eu-west-1-0.aws.cloud.qdrant.io
     api_key=os.environ["QDRANT_API_KEY"],
 )
 
