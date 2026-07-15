@@ -20,7 +20,7 @@ with st.sidebar:
     api_key_input = st.text_input(
         "Enter your Groq API key",
         type="password",
-        value=os.environ.get("GROQ_API_KEY", ""),
+        #value=os.environ.get("GROQ_API_KEY", ""),
         help="Get a free key at https://console.groq.com/keys. "
              "Kept only in this session, not saved anywhere."
     )
