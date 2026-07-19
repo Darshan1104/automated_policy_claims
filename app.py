@@ -117,3 +117,22 @@ if st.button("Evaluate Claim"):
         st.info("Ensure all nodes in your graph return the full state dictionary.")
     except Exception as e:
         st.error(f"An unexpected error occurred: {e}")
+
+st.divider()
+        st.subheader("🧪 RAG Quality (RAGAS)")
+        with st.spinner("Scoring the answer against retrieved policy context..."):
+            try:
+                from ragas_eval import evaluate_claim_result
+                scores = evaluate_claim_result(claim, result)
+
+                col1, col2 = st.columns(2)
+                col1.metric("Faithfulness", f"{scores['faithfulness']:.2f}")
+                col2.metric("Answer Relevancy", f"{scores['answer_relevancy']:.2f}")
+
+                if scores["faithfulness"] < 0.7:
+                    st.warning(
+                        "Faithfulness is low — the reasoning may include claims "
+                        "not backed by the retrieved policy text."
+                    )
+            except Exception as e:
+                st.info(f"RAGAS evaluation unavailable: {e}")
