@@ -5,227 +5,217 @@ import streamlit as st
 from graph import graph
 
 st.set_page_config(
-    page_title="査定 — Adjudicator",
-    page_icon="⚪",
-    layout="wide",
+    page_title="Claims Adjudicator",
+    page_icon="🗂️",
+    layout="centered",
     initial_sidebar_state="collapsed",
 )
 
 # =====================================================================
 # DESIGN TOKENS
 # =====================================================================
-# Palette (named, not generic):
-#   Washi  #F5F1E7  -- paper background
-#   Sumi   #22201C  -- ink / primary text
-#   Kinari #EDE7D8  -- panel fill, one shade off paper
-#   Line   #D9D0BC  -- hairline borders
-#   Shu    #B23A2E  -- vermillion, reserved for the seal only
-#   Ai     #2E4A63  -- indigo, approve state
-#   Take   #5C7A5E  -- bamboo, used sparingly for "ready" states
-#   Fade   #8C8474  -- muted secondary text
-# Type:
-#   Shippori Mincho     -- title, verdict word (2 weights only)
-#   Zen Kaku Gothic New -- body copy (2 weights only)
-#   IBM Plex Mono       -- case numbers, citations, data (2 weights only)
+# One family (Inter), used with real hierarchy, so nothing has to
+# fight for attention. Mono (JetBrains Mono) reserved for case
+# numbers and citations only.
+#
+# Type scale:
+#   Page title      26px / 700
+#   Section eyebrow  12.5px / 600, uppercase, tracked
+#   Body / reasoning 15.5px / 400, line-height 1.65
+#   Verdict word     22px / 700
+#   Stat number      30px / 700
+#
+# Color:
+#   Ink       #14161A  primary text
+#   Muted     #6B7280  secondary text
+#   Border    #E5E7EB
+#   Surface   #FFFFFF
+#   Canvas    #FAFAFA
+#   Accent    #4F46E5  primary actions
+#   Approve   text #15803D  bg #ECFDF3  border #86EFAC
+#   Deny      text #B91C1C  bg #FEF2F2  border #FCA5A5
+#   Review    text #B45309  bg #FFFBEB  border #FDE68A
 
 st.markdown("""
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700&family=Zen+Kaku+Gothic+New:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
 :root {
-    --washi: #F5F1E7;
-    --sumi: #22201C;
-    --kinari: #EDE7D8;
-    --line: #D9D0BC;
-    --shu: #B23A2E;
-    --ai: #2E4A63;
-    --take: #5C7A5E;
-    --fade: #8C8474;
+    --ink: #14161A;
+    --muted: #6B7280;
+    --border: #E5E7EB;
+    --surface: #FFFFFF;
+    --canvas: #FAFAFA;
+    --accent: #4F46E5;
+    --accent-soft: #EEF2FF;
 }
 
 #MainMenu, footer, header { visibility: hidden; height: 0; }
 .block-container {
-    padding: 1.6rem 3rem 1rem 3rem !important;
-    max-width: 1180px !important;
+    padding: 2.2rem 1.5rem 3rem 1.5rem !important;
+    max-width: 820px !important;
 }
+.stApp { background: var(--canvas); font-family: 'Inter', sans-serif; }
+h1,h2,h3,p,span,div,label { color: var(--ink); }
 
-.stApp {
-    background: var(--washi);
-    color: var(--sumi);
-    font-family: 'Zen Kaku Gothic New', sans-serif;
-}
-h1,h2,h3,label,p,span,div { color: var(--sumi); }
-
-/* ---------- header ---------- */
+/* ---------- top bar ---------- */
 .top {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
-    border-bottom: 1px solid var(--line);
-    padding-bottom: 14px;
-    margin-bottom: 22px;
-}
-.title-jp {
-    font-family: 'Shippori Mincho', serif;
-    font-size: 30px;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    line-height: 1;
-}
-.title-en {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    color: var(--fade);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-top: 4px;
-}
-.pills { display: flex; gap: 10px; align-items: center; }
-.pill {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.04em;
-    color: var(--fade);
-    background: var(--kinari);
-    border: 1px solid var(--line);
-    border-radius: 20px;
-    padding: 5px 12px;
-    display: flex;
     align-items: center;
-    gap: 6px;
-    animation: breathe 4.5s ease-in-out infinite;
+    margin-bottom: 28px;
 }
-@keyframes breathe {
-    0%, 100% { opacity: 0.75; }
-    50% { opacity: 1; }
+.page-title { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+.page-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.meta {
+    display: flex; gap: 10px; align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--muted);
 }
-.dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
-.dot.ready { background: var(--take); }
-.dot.idle { background: var(--fade); }
+.kb-chip {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 11px;
+}
+.kb-dot { width: 6px; height: 6px; border-radius: 50%; }
+.kb-dot.ready { background: #15803D; }
+.kb-dot.idle { background: var(--muted); }
 
-/* ---------- panel ---------- */
-.panel {
-    background: var(--kinari);
-    border: 1px solid var(--line);
-    border-radius: 3px;
-    padding: 26px 28px;
-    box-shadow: 0 1px 3px rgba(34,32,28,0.05);
+/* ---------- card ---------- */
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 26px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 2px rgba(20,22,26,0.04);
 }
-.panel-label {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10.5px;
-    letter-spacing: 0.14em;
+.eyebrow {
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    color: var(--fade);
-    margin-bottom: 14px;
+    color: var(--muted);
+    margin-bottom: 12px;
 }
-.hr { border: none; border-top: 1px solid var(--line); margin: 18px 0; }
-
-/* ---------- pipeline (quiet, inline dots) ---------- */
-.steps { display: flex; gap: 18px; margin-top: 16px; }
-.step { display: flex; align-items: center; gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--fade); }
-.step .sd { width: 6px; height: 6px; border-radius: 50%; background: var(--line); transition: background 0.4s ease; }
-.step.done .sd { background: var(--ai); }
-.step.done { color: var(--sumi); }
-
-/* ---------- ensō (thinking indicator) ---------- */
-.enso-wrap { display: flex; justify-content: center; padding: 30px 0 18px 0; }
-.enso-circle {
-    stroke-dasharray: 620;
-    stroke-dashoffset: 620;
-    animation: draw 1.6s cubic-bezier(.65,0,.35,1) forwards;
-}
-@keyframes draw { to { stroke-dashoffset: 40; } }
-.enso-caption {
+.hint {
+    font-size: 13.5px;
+    color: var(--muted);
+    font-style: italic;
     text-align: center;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    color: var(--fade);
-    margin-top: -8px;
+    padding: 6px 0 2px 0;
 }
 
-/* ---------- hanko seal ---------- */
-.seal-wrap { display: flex; justify-content: center; padding: 8px 0 6px 0; }
-.seal {
-    width: 108px; height: 108px;
-    border: 3px solid var(--shu);
-    border-radius: 6px;
+/* ---------- live pipeline timeline ---------- */
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.tl-row {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 14px;
+    padding: 6px 0;
+    animation: slideIn 0.3s ease;
+}
+.tl-check {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent);
     display: flex; align-items: center; justify-content: center;
-    transform: rotate(-3deg) scale(1);
-    animation: stamp 0.5s cubic-bezier(.34,1.56,.64,1) both;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
 }
-@keyframes stamp {
-    0% { opacity: 0; transform: rotate(-3deg) scale(1.6); }
-    70% { opacity: 1; }
-    100% { opacity: 1; transform: rotate(-3deg) scale(1); }
-}
-.seal-text {
-    font-family: 'Shippori Mincho', serif;
-    font-weight: 700;
-    color: var(--shu);
-    font-size: 15px;
-    text-align: center;
-    line-height: 1.25;
-    letter-spacing: 0.03em;
-}
-.seal.deny { border-color: var(--sumi); }
-.seal.deny .seal-text { color: var(--sumi); }
-.seal.review { border-color: var(--ai); }
-.seal.review .seal-text { color: var(--ai); }
 
-/* ---------- citations ---------- */
-.citation {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-    color: var(--sumi);
-    padding: 7px 0 7px 14px;
-    border-left: 2px solid var(--shu);
-    margin-bottom: 6px;
+/* ---------- verdict banner ---------- */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.verdict {
+    display: flex; align-items: center; gap: 14px;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 18px;
+    animation: fadeUp 0.4s ease;
+}
+.verdict.approve { background: #ECFDF3; border: 1px solid #86EFAC; }
+.verdict.deny { background: #FEF2F2; border: 1px solid #FCA5A5; }
+.verdict.review { background: #FFFBEB; border: 1px solid #FDE68A; }
+.verdict-icon { font-size: 26px; line-height: 1; }
+.verdict-word {
+    font-size: 21px; font-weight: 700; letter-spacing: -0.01em;
+}
+.verdict.approve .verdict-word { color: #15803D; }
+.verdict.deny .verdict-word { color: #B91C1C; }
+.verdict.review .verdict-word { color: #B45309; }
+.verdict-case {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--muted); margin-top: 2px;
 }
 
 /* ---------- reasoning ---------- */
-.reasoning-zone {
-    max-height: 190px;
-    overflow-y: auto;
+.reasoning {
+    font-size: 15.5px;
     line-height: 1.65;
-    font-size: 14.5px;
-    padding-right: 6px;
+    color: var(--ink);
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: 4px;
 }
-.reasoning-zone::-webkit-scrollbar { width: 3px; }
-.reasoning-zone::-webkit-scrollbar-thumb { background: var(--line); }
+.reasoning::-webkit-scrollbar { width: 4px; }
+.reasoning::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-/* ---------- rag gauges ---------- */
-.gauge-row { display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--fade); margin-bottom: 5px; }
-.gauge-track { background: var(--washi); border: 1px solid var(--line); border-radius: 2px; height: 5px; overflow: hidden; }
-.gauge-fill { height: 100%; transition: width 0.6s ease; }
+/* ---------- citations ---------- */
+.citation-chip {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin: 0 6px 6px 0;
+}
 
-/* ---------- inputs ---------- */
+/* ---------- stat cards ---------- */
+.stat-grid { display: flex; gap: 14px; }
+.stat-card {
+    flex: 1;
+    background: var(--canvas);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+}
+.stat-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.stat-value { font-size: 28px; font-weight: 700; }
+.stat-track { background: var(--border); border-radius: 3px; height: 5px; overflow: hidden; margin-top: 8px; }
+.stat-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+
+/* ---------- form controls ---------- */
 textarea {
-    background: var(--washi) !important;
-    color: var(--sumi) !important;
-    border: 1px solid var(--line) !important;
-    font-family: 'Zen Kaku Gothic New', sans-serif !important;
-    font-size: 14.5px !important;
-    border-radius: 2px !important;
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
+    font-size: 15px !important;
+    color: var(--ink) !important;
 }
 .stButton > button {
-    background: var(--sumi) !important;
-    color: var(--washi) !important;
-    font-family: 'Zen Kaku Gothic New', sans-serif !important;
-    font-weight: 500 !important;
+    background: var(--accent) !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
     border: none !important;
-    border-radius: 2px !important;
-    padding: 10px 0 !important;
-    width: 100%;
-    letter-spacing: 0.03em;
-    transition: background 0.2s ease;
+    border-radius: 8px !important;
+    height: 44px !important;
+    padding: 0 22px !important;
 }
-.stButton > button:hover { background: var(--shu) !important; }
+.stButton > button:hover { background: #4338CA !important; }
 [data-testid="stTextInput"] input {
-    background: var(--washi) !important;
-    color: var(--sumi) !important;
-    border: 1px solid var(--line) !important;
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -237,7 +227,7 @@ if "case_number" not in st.session_state:
     st.session_state.case_number = "CF-" + str(uuid.uuid4())[:8].upper()
 
 # =====================================================================
-# HEADER
+# TOP BAR
 # =====================================================================
 try:
     from retriever import get_collection_status
@@ -245,18 +235,18 @@ try:
 except Exception:
     kb_ready, kb_count = False, 0
 
-kb_dot_class = "ready" if kb_ready else "idle"
-kb_label = f"{kb_count} CHUNKS" if kb_ready else "KB IDLE"
+kb_dot = "ready" if kb_ready else "idle"
+kb_label = f"{kb_count} chunks loaded" if kb_ready else "KB idle"
 
 st.markdown(f"""
 <div class="top">
     <div>
-        <div class="title-jp">査定</div>
-        <div class="title-en">Claims Adjudicator</div>
+        <div class="page-title">Claims Adjudicator</div>
+        <div class="page-sub">AI-assisted policy claim evaluation</div>
     </div>
-    <div class="pills">
-        <div class="pill"><span class="dot {kb_dot_class}"></span>{kb_label}</div>
-        <div class="pill">{st.session_state.case_number}</div>
+    <div class="meta">
+        <div class="kb-chip"><span class="kb-dot {kb_dot}"></span>{kb_label}</div>
+        <div class="kb-chip">{st.session_state.case_number}</div>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -276,88 +266,66 @@ with key_ctx:
         os.environ["GROQ_API_KEY"] = api_key_input
 
 # =====================================================================
-# HELPERS
+# NODE LABELS FOR THE LIVE STREAM
 # =====================================================================
-STEP_LABELS = [("retrieve", "Retrieve"), ("grade", "Grade"), ("decision", "Decide"), ("hallucination", "Verify")]
+NODE_LABELS = {
+    "retrieve": "Retrieving policy documents",
+    "grade": "Grading retrieval relevance",
+    "rewrite": "Rewriting search query",
+    "web": "Searching web for context",
+    "decision": "Rendering decision",
+    "hallucination": "Verifying grounding",
+    "human": "Escalating to human review",
+    "finish": "Finalizing",
+}
 
-def render_steps(done=None):
-    done = done or set()
-    out = '<div class="steps">'
-    for key, label in STEP_LABELS:
-        cls = "step done" if key in done else "step"
-        out += f'<div class="{cls}"><span class="sd"></span>{label}</div>'
-    out += "</div>"
-    return out
+def render_timeline(steps):
+    rows = ""
+    for i, key in enumerate(steps, start=1):
+        label = NODE_LABELS.get(key, key)
+        rows += f'<div class="tl-row"><span class="tl-check">✓</span>{label}</div>'
+    return rows
 
-def gauge(label, value):
+def gauge_card(label, value):
     pct = max(0, min(100, round(value * 100)))
-    color = "var(--take)" if pct >= 70 else ("var(--ai)" if pct >= 40 else "var(--shu)")
-    st.markdown(f"""
-    <div class="gauge-row"><span>{label}</span><span>{value:.2f}</span></div>
-    <div class="gauge-track"><div class="gauge-fill" style="width:{pct}%; background:{color};"></div></div>
-    """, unsafe_allow_html=True)
-
-ENSO_SVG = """
-<div class="enso-wrap">
-<svg width="120" height="120" viewBox="0 0 220 220">
-    <circle class="enso-circle" cx="110" cy="110" r="88" fill="none" stroke="#22201C" stroke-width="7" stroke-linecap="round"/>
-</svg>
-</div>
-"""
+    color = "#15803D" if pct >= 70 else ("#B45309" if pct >= 40 else "#B91C1C")
+    return f"""
+    <div class="stat-card">
+        <div class="stat-label">{label}</div>
+        <div class="stat-value">{value:.2f}</div>
+        <div class="stat-track"><div class="stat-fill" style="width:{pct}%; background:{color};"></div></div>
+    </div>
+    """
 
 # =====================================================================
-# MAIN LAYOUT -- two quiet panels, generous margin between
+# INPUT CARD
 # =====================================================================
-col_left, col_right = st.columns([1, 1.15], gap="large")
-
-with col_left:
-    st.markdown('<div class="panel">', unsafe_allow_html=True)
-    st.markdown('<div class="panel-label">Statement of Loss</div>', unsafe_allow_html=True)
-    claim = st.text_area(
-        "Statement of loss",
-        height=190,
-        label_visibility="collapsed",
-        placeholder="Describe what happened, when, and what was damaged or lost..."
-    )
-    submitted = st.button("File Claim")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-result_slot = col_right.empty()
-
-def draw_idle():
-    with result_slot.container():
-        st.markdown('<div class="panel" style="min-height:420px; display:flex; flex-direction:column; justify-content:center;">', unsafe_allow_html=True)
-        st.markdown("""
-        <div class="enso-wrap">
-        <svg width="110" height="110" viewBox="0 0 220 220">
-            <circle cx="110" cy="110" r="88" fill="none" stroke="#D9D0BC" stroke-width="4" stroke-dasharray="6 10" stroke-linecap="round"/>
-        </svg>
-        </div>
-        <div class="enso-caption">Awaiting a claim</div>
-        """, unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+st.markdown('<div class="card">', unsafe_allow_html=True)
+st.markdown('<div class="eyebrow">Statement of Loss</div>', unsafe_allow_html=True)
+claim = st.text_area(
+    "Statement of loss",
+    height=150,
+    label_visibility="collapsed",
+    placeholder="Describe what happened, when, and what was damaged or lost..."
+)
+submitted = st.button("File Claim")
+st.markdown("</div>", unsafe_allow_html=True)
 
 if not submitted:
-    draw_idle()
+    st.markdown('<p class="hint">Your case analysis will appear here once a claim is filed.</p>', unsafe_allow_html=True)
 
+# =====================================================================
+# PROCESS + LIVE RESULTS
+# =====================================================================
 if submitted:
 
     if not os.environ.get("GROQ_API_KEY"):
         st.error("Enter your Groq API key via ⚙ above before filing a claim.")
-        draw_idle()
         st.stop()
 
     if not claim.strip():
         st.warning("Enter a statement of loss before filing the claim.")
-        draw_idle()
         st.stop()
-
-    with result_slot.container():
-        st.markdown('<div class="panel" style="min-height:420px;">', unsafe_allow_html=True)
-        st.markdown(ENSO_SVG, unsafe_allow_html=True)
-        st.markdown('<div class="enso-caption">Reading the policy...</div>', unsafe_allow_html=True)
-        st.markdown(render_steps(), unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
 
     initial_state = {
         "claim": claim,
@@ -376,59 +344,80 @@ if submitted:
     }
     config = {"configurable": {"thread_id": str(uuid.uuid4())}}
 
+    timeline_slot = st.empty()
+    completed_steps = []
+    accumulated_state = dict(initial_state)
+
     try:
-        result = graph.invoke(initial_state, config=config)
+        with timeline_slot.container():
+            st.markdown('<div class="card">', unsafe_allow_html=True)
+            st.markdown('<div class="eyebrow">Pipeline</div>', unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        for step_output in graph.stream(initial_state, config=config):
+            for node_name, node_state in step_output.items():
+                if isinstance(node_state, dict):
+                    accumulated_state.update(node_state)
+                completed_steps.append(node_name)
+                with timeline_slot.container():
+                    st.markdown('<div class="card">', unsafe_allow_html=True)
+                    st.markdown('<div class="eyebrow">Pipeline</div>', unsafe_allow_html=True)
+                    st.markdown(render_timeline(completed_steps), unsafe_allow_html=True)
+                    st.markdown("</div>", unsafe_allow_html=True)
+
+        result = accumulated_state
 
         decision = result.get("decision", "MANUAL_REVIEW")
         reasoning = result.get("reasoning", "No reasoning provided.")
         citations = result.get("citations", [])
         needs_human = result.get("needs_human", False)
 
-        seal_class = {"APPROVE": "", "DENY": "deny"}.get(decision, "review")
-        seal_text = {"APPROVE": "承認<br>Approved", "DENY": "却下<br>Denied"}.get(decision, "審査中<br>Manual<br>Review")
+        verdict_class = {"APPROVE": "approve", "DENY": "deny"}.get(decision, "review")
+        verdict_icon = {"APPROVE": "✅", "DENY": "⛔"}.get(decision, "🔎")
+        verdict_word = {"APPROVE": "Approved", "DENY": "Denied"}.get(decision, "Manual Review")
 
-        with result_slot.container():
-            st.markdown('<div class="panel">', unsafe_allow_html=True)
-
-            st.markdown(f"""
-            <div class="seal-wrap">
-                <div class="seal {seal_class}"><div class="seal-text">{seal_text}</div></div>
+        st.markdown(f"""
+        <div class="verdict {verdict_class}">
+            <div class="verdict-icon">{verdict_icon}</div>
+            <div>
+                <div class="verdict-word">{verdict_word}</div>
+                <div class="verdict-case">{st.session_state.case_number}</div>
             </div>
-            """, unsafe_allow_html=True)
-            st.markdown(render_steps({"retrieve", "grade", "decision", "hallucination"}), unsafe_allow_html=True)
-            if needs_human:
-                st.caption("⚠ Escalated for manual adjuster review.")
+        </div>
+        """, unsafe_allow_html=True)
 
-            st.markdown('<hr class="hr">', unsafe_allow_html=True)
-            st.markdown('<div class="panel-label">Case Notes</div>', unsafe_allow_html=True)
-            st.markdown(f'<div class="reasoning-zone">{reasoning}</div>', unsafe_allow_html=True)
+        if needs_human:
+            st.warning("This case has been escalated for manual adjuster review.")
 
-            st.markdown('<hr class="hr">', unsafe_allow_html=True)
-            st.markdown('<div class="panel-label">Policy Citations</div>', unsafe_allow_html=True)
-            if citations:
-                for c in citations:
-                    st.markdown(f'<div class="citation">{c}</div>', unsafe_allow_html=True)
-            else:
-                st.caption("No specific citations found.")
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.markdown('<div class="eyebrow">Case Notes</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="reasoning">{reasoning}</div>', unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
-            st.markdown('<hr class="hr">', unsafe_allow_html=True)
-            st.markdown('<div class="panel-label">RAG Quality</div>', unsafe_allow_html=True)
-            try:
-                from ragas_eval import evaluate_claim_result
-                scores = evaluate_claim_result(claim, result)
-                gc1, gc2 = st.columns(2)
-                with gc1:
-                    gauge("Faithfulness", scores.get("faithfulness", 0))
-                with gc2:
-                    gauge("Relevancy", scores.get("answer_relevancy", 0))
-            except Exception as e:
-                st.caption(f"Scoring unavailable: {e}")
-
+        if citations:
+            st.markdown('<div class="card">', unsafe_allow_html=True)
+            st.markdown('<div class="eyebrow">Policy Citations</div>', unsafe_allow_html=True)
+            chips = "".join(f'<span class="citation-chip">{c}</span>' for c in citations)
+            st.markdown(chips, unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
 
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.markdown('<div class="eyebrow">RAG Quality</div>', unsafe_allow_html=True)
+        try:
+            from ragas_eval import evaluate_claim_result
+            scores = evaluate_claim_result(claim, result)
+            st.markdown(
+                '<div class="stat-grid">'
+                + gauge_card("Faithfulness", scores.get("faithfulness", 0))
+                + gauge_card("Answer Relevancy", scores.get("answer_relevancy", 0))
+                + '</div>',
+                unsafe_allow_html=True
+            )
+        except Exception as e:
+            st.caption(f"Scoring unavailable: {e}")
+        st.markdown("</div>", unsafe_allow_html=True)
+
     except KeyError as e:
-        with result_slot.container():
-            st.error(f"Graph returned an incomplete state. Missing key: {e}")
+        st.error(f"Graph returned an incomplete state. Missing key: {e}")
     except Exception as e:
-        with result_slot.container():
-            st.error(f"An unexpected error occurred: {e}")
+        st.error(f"An unexpected error occurred: {e}")
