@@ -53,3 +53,4 @@ pydantic
 # Tokenizer
 # -----------------------------
 tiktoken
+ragas datasets
