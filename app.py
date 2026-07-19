@@ -12,30 +12,8 @@ st.set_page_config(
 )
 
 # =====================================================================
-# DESIGN TOKENS
+# DESIGN TOKENS & STYLES
 # =====================================================================
-# One family (Inter), used with real hierarchy, so nothing has to
-# fight for attention. Mono (JetBrains Mono) reserved for case
-# numbers and citations only.
-#
-# Type scale:
-#   Page title      26px / 700
-#   Section eyebrow  12.5px / 600, uppercase, tracked
-#   Body / reasoning 15.5px / 400, line-height 1.65
-#   Verdict word     22px / 700
-#   Stat number      30px / 700
-#
-# Color:
-#   Ink       #14161A  primary text
-#   Muted     #6B7280  secondary text
-#   Border    #E5E7EB
-#   Surface   #FFFFFF
-#   Canvas    #FAFAFA
-#   Accent    #4F46E5  primary actions
-#   Approve   text #15803D  bg #ECFDF3  border #86EFAC
-#   Deny      text #B91C1C  bg #FEF2F2  border #FCA5A5
-#   Review    text #B45309  bg #FFFBEB  border #FDE68A
-
 st.markdown("""
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -180,7 +158,7 @@ h1,h2,h3,p,span,div,label { color: var(--ink); }
 }
 
 /* ---------- stat cards ---------- */
-.stat-grid { display: flex; gap: 14px; }
+.stat-grid { display: flex; gap: 14px; width: 100%; }
 .stat-card {
     flex: 1;
     background: var(--canvas);
@@ -286,16 +264,11 @@ def render_timeline(steps):
         rows += f'<div class="tl-row"><span class="tl-check">✓</span>{label}</div>'
     return rows
 
+# Fixed to return clean single-line strings with no internal formatting glitches
 def gauge_card(label, value):
     pct = max(0, min(100, round(value * 100)))
     color = "#15803D" if pct >= 70 else ("#B45309" if pct >= 40 else "#B91C1C")
-    return f"""
-    <div class="stat-card">
-        <div class="stat-label">{label}</div>
-        <div class="stat-value">{value:.2f}</div>
-        <div class="stat-track"><div class="stat-fill" style="width:{pct}%; background:{color};"></div></div>
-    </div>
-    """
+    return f'<div class="stat-card"><div class="stat-label">{label}</div><div class="stat-value">{value:.2f}</div><div class="stat-track"><div class="stat-fill" style="width:{pct}%; background:{color};"></div></div></div>'
 
 # =====================================================================
 # INPUT CARD
@@ -401,18 +374,17 @@ if submitted:
             st.markdown(chips, unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
 
+        # RAG Quality Container with Fixed, Inline-Joined Metrics
         st.markdown('<div class="card">', unsafe_allow_html=True)
         st.markdown('<div class="eyebrow">RAG Quality</div>', unsafe_allow_html=True)
         try:
             from ragas_eval import evaluate_claim_result
             scores = evaluate_claim_result(claim, result)
-            st.markdown(
-                '<div class="stat-grid">'
-                + gauge_card("Faithfulness", scores.get("faithfulness", 0))
-                + gauge_card("Answer Relevancy", scores.get("answer_relevancy", 0))
-                + '</div>',
-                unsafe_allow_html=True
-            )
+            
+            card_1 = gauge_card("Faithfulness", scores.get("faithfulness", 0))
+            card_2 = gauge_card("Answer Relevancy", scores.get("answer_relevancy", 0))
+            
+            st.markdown(f'<div class="stat-grid">{card_1}{card_2}</div>', unsafe_allow_html=True)
         except Exception as e:
             st.caption(f"Scoring unavailable: {e}")
         st.markdown("</div>", unsafe_allow_html=True)
