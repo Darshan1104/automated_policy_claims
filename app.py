@@ -6,7 +6,7 @@ from graph import graph
 
 st.set_page_config(
     page_title="Claims Adjudicator",
-    page_icon="🗂️",
+    page_icon="🛡️",
     layout="wide",  # Changed to wide layout to eliminate scrolling
     initial_sidebar_state="collapsed",
 )
