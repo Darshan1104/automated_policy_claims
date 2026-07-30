@@ -212,7 +212,7 @@ kb_label = f"{kb_count} chunks loaded" if kb_ready else "KB idle"
 st.markdown(f"""
 <div class="top">
     <div>
-        <div class="page-title">verdynenai_Claims Adjudicator</div>
+        <div class="page-title">VerdynenAI_Claims Adjudicator</div>
         <div class="page-sub">AI-assisted policy claim evaluation workspace</div>
     </div>
     <div class="meta">
