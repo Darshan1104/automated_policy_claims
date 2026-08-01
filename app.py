@@ -15,10 +15,12 @@ st.set_page_config(
 # PREMIUM UX / UI DESIGN TOKENS & ANIMATIONS
 # =====================================================================
 st.markdown("""
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
 <style>
+
+/* ============================
+   THEME VARIABLES
+============================ */
+
 :root {
     --ink: #14161A;
     --muted: #6B7280;
@@ -29,165 +31,158 @@ st.markdown("""
     --accent-soft: #EEF2FF;
 }
 
-#MainMenu, footer, header { visibility: hidden; height: 0; }
+/* ============================
+   PAGE
+============================ */
+
+.stApp {
+    background: var(--canvas);
+    font-family: 'Inter', sans-serif;
+}
+
+h1, h2, h3, p, span, div, label {
+    color: var(--ink);
+}
 
 .block-container {
     padding: 1.5rem 2rem !important;
     max-width: 1400px !important;
 }
-.stApp { background: var(--canvas); font-family: 'Inter', sans-serif; }
-h1,h2,h3,p,span,div,label { color: var(--ink); }
 
-/* ---------- top bar ---------- */
-.top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 12px;
-}
-.page-title { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
-.page-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
-.meta {
-    display: flex; gap: 10px; align-items: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12.5px;
-    color: var(--muted);
-}
-.kb-chip {
-    display: flex; align-items: center; gap: 6px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 5px 11px;
-}
-.kb-dot { width: 6px; height: 6px; border-radius: 50%; }
-.kb-dot.ready { background: #15803D; }
-.kb-dot.idle { background: var(--muted); }
-
-/* ---------- sleek dashboard cards ---------- */
-.card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px 22px;
-    margin-bottom: 14px;
-    box-shadow: 0 1px 2px rgba(20,22,26,0.02);
-}
-.eyebrow {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 10px;
-}
-.hint {
-    font-size: 14px;
-    color: var(--muted);
-    font-style: italic;
-    text-align: center;
-    padding: 40px 0;
+#MainMenu,
+footer,
+header {
+    visibility: hidden;
 }
 
-/* ---------- animated pipeline timeline ---------- */
-@keyframes slideIn {
-    from { opacity: 0; transform: translateX(-6px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-.tl-row {
-    display: flex; align-items: center; gap: 10px;
-    font-size: 13.5px;
-    padding: 6px 0;
-    animation: slideIn 0.25s ease-out forwards;
-}
-.tl-check {
-    width: 18px; height: 18px; border-radius: 50%;
-    background: var(--accent-soft); color: var(--accent);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 10px; font-weight: 700; flex-shrink: 0;
-}
+/* ============================
+   INPUTS
+============================ */
 
-/* ---------- verdict banner ---------- */
-@keyframes popUp {
-    from { opacity: 0; transform: scale(0.98); }
-    to { opacity: 1; transform: scale(1); }
-}
-.verdict {
-    display: flex; align-items: center; gap: 14px;
-    border-radius: 12px;
-    padding: 16px 20px;
-    margin-bottom: 14px;
-    animation: popUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-.verdict.approve { background: #ECFDF3; border: 1px solid #86EFAC; }
-.verdict.deny { background: #FEF2F2; border: 1px solid #FCA5A5; }
-.verdict.review { background: #FFFBEB; border: 1px solid #FDE68A; }
-.verdict-icon { font-size: 24px; line-height: 1; }
-.verdict-word { font-size: 19px; font-weight: 700; letter-spacing: -0.01em; }
-.verdict.approve .verdict-word { color: #15803D; }
-.verdict.deny .verdict-word { color: #B91C1C; }
-.verdict.review .verdict-word { color: #B45309; }
-.verdict-case { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); margin-top: 1px; }
-
-/* ---------- reasoning panel (scroll protected) ---------- */
-.reasoning {
-    font-size: 14.5px;
-    line-height: 1.6;
-    color: var(--ink);
-    max-height: 200px;
-    overflow-y: auto;
-    padding-right: 4px;
-}
-.reasoning::-webkit-scrollbar { width: 4px; }
-.reasoning::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-/* ---------- citation chips ---------- */
-.citation-chip {
-    display: inline-block;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    background: var(--accent-soft);
-    color: var(--accent);
-    border-radius: 6px;
-    padding: 4px 8px;
-    margin: 0 6px 6px 0;
-}
-
-/* ---------- metrics gauge grid ---------- */
-.stat-grid { display: flex; gap: 12px; width: 100%; }
-.stat-card {
-    flex: 1;
-    background: var(--canvas);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px 14px;
-}
-.stat-label { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
-.stat-value { font-size: 24px; font-weight: 700; }
-.stat-track { background: var(--border); border-radius: 2px; height: 4px; overflow: hidden; margin-top: 6px; }
-.stat-fill { height: 100%; border-radius: 2px; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
-
-/* ---------- st framework cleanups ---------- */
-textarea {
+textarea,
+input {
     background: var(--surface) !important;
+    color: var(--ink) !important;
     border: 1px solid var(--border) !important;
     border-radius: 8px !important;
-    font-size: 14.5px !important;
-    color: var(--ink) !important;
 }
+
+/* Fix placeholder text */
+
+textarea::placeholder,
+input::placeholder {
+    color: #9CA3AF !important;
+}
+
+/* Streamlit text input */
+
+.stTextInput input {
+    background: white !important;
+    color: black !important;
+}
+
+.stTextArea textarea {
+    background: white !important;
+    color: black !important;
+}
+
+/* ============================
+   BUTTONS
+============================ */
+
 .stButton > button {
     background: var(--accent) !important;
-    color: #fff !important;
-    font-weight: 600 !important;
-    font-size: 14.5px !important;
+    color: white !important;
     border: none !important;
     border-radius: 8px !important;
     height: 40px !important;
     width: 100% !important;
 }
-.stButton > button:hover { background: #4338CA !important; }
+
+.stButton > button:hover {
+    background: #4338CA !important;
+}
+
+/* ============================
+   POPOVER BUTTON
+============================ */
+
+[data-testid="stPopover"] button {
+    background: white !important;
+    color: black !important;
+    border: 1px solid #E5E7EB !important;
+    border-radius: 8px !important;
+    min-height: 42px !important;
+}
+
+[data-testid="stPopover"] button span,
+[data-testid="stPopover"] button p,
+[data-testid="stPopover"] button div {
+    color: black !important;
+}
+
+/* Hover */
+
+[data-testid="stPopover"] button:hover {
+    background: #F3F4F6 !important;
+}
+
+/* ============================
+   POPOVER CONTENT
+============================ */
+
+[data-testid="stPopoverContent"] {
+    background: white !important;
+    border: 1px solid #E5E7EB !important;
+    border-radius: 10px !important;
+    padding: 12px !important;
+}
+
+[data-testid="stPopoverContent"] * {
+    color: black !important;
+}
+
+/* ============================
+   PASSWORD FIELD INSIDE POPOVER
+============================ */
+
+[data-testid="stPopoverContent"] input {
+    background: white !important;
+    color: black !important;
+    border: 1px solid #D1D5DB !important;
+}
+
+/* ============================
+   DARK THEME SUPPORT
+============================ */
+
+@media (prefers-color-scheme: dark) {
+
+    [data-testid="stPopover"] button {
+        background: #1F2937 !important;
+        color: white !important;
+        border: 1px solid #374151 !important;
+    }
+
+    [data-testid="stPopover"] button * {
+        color: white !important;
+    }
+
+    [data-testid="stPopoverContent"] {
+        background: #111827 !important;
+    }
+
+    [data-testid="stPopoverContent"] * {
+        color: white !important;
+    }
+
+    [data-testid="stPopoverContent"] input {
+        background: #1F2937 !important;
+        color: white !important;
+        border: 1px solid #374151 !important;
+    }
+}
+
 </style>
 """, unsafe_allow_html=True)
 
