@@ -229,10 +229,8 @@ left_col, right_col = st.columns([4, 5], gap="large")
 
 with left_col:
     # 1. API Configuration Context Panel
-    try:
-        key_ctx = st.popover("⚙ Configure Workspace Credentials", use_container_width=True)
-    except AttributeError:
-        key_ctx = st.expander("⚙ Configure Workspace Credentials")
+    key_ctx = st.expander("⚙ Configure Workspace Credentials",
+        expanded=False)
 
     with key_ctx:
         api_key_input = st.text_input(
