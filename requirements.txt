@@ -55,3 +55,14 @@ pydantic
 tiktoken
 ragas
 datasets
+
+# -----------------------------
+# API (deployment)
+# -----------------------------
+fastapi
+uvicorn[standard]
+
+# -----------------------------
+# Load testing (script only)
+# -----------------------------
+aiohttp
